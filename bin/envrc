@@ -1,0 +1,4 @@
+# cassandra info
+export CASSANDRA_CLUSTER=<node_add1>,<node_add2>,<node_add3>
+export CASSANDRA_USERNAME=<user_name>
+export CASSANDRA_PASSWORD=<password>
