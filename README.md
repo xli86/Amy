@@ -9,11 +9,17 @@
 - Modify {Cassandra Dir}/conf/cassandra.yaml, change authenticator to PasswordAuthenticator
 - Start Cassabdra: {Cassandra Dir}/bin/cassandra -f
 - Connect Cassandra through cqlsh: cqlsh 127.0.0.1 -u cassandra -p cassandra
-- In CQLSH, enter "CREATE USER <your_username> WITH PASSWORD '<your_password>' SUPERUSER;". This will create a new super user.
+- In CQLSH, enter "CREATE USER your_username WITH PASSWORD 'your_password' SUPERUSER;". This will create a new super user.
 - Login with new user
 - In CQLSH, enter "DROP USER cassandra;"
 
 ### Create table
+```
+CREATE KEYSPACE mykeyspace
+  WITH REPLICATION = { 'class' : 'SimpleStrategy', 'replication_factor' : 1 };
+USE mykeyspace;
+```
+
 ```
 create table acronyms (
 	acronym text,
