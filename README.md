@@ -5,7 +5,8 @@
 ### Environment setup (on Ubuntu)
 - Download Cassandra from Apache [website](http://cassandra.apache.org)
 - tar -xvzf apache-cassandra-3.9-bin.tar.gz
-- Modify /etc/cassandra/cassandra.yaml, change rpc_address to 0.0.0.0 so that it can be accessed outside.
+- Modify {Cassandra Dir}/conf/cassandra.yaml, change rpc_address to 0.0.0.0 so that it can be accessed outside.
+- Modify {Cassandra Dir}/conf/cassandra.yaml, change authenticator to PasswordAuthenticator
 - Start Cassabdra: {Cassandra Dir}/bin/cassandra -f
 - Connect Cassandra through cqlsh: cqlsh 127.0.0.1 -u your_username -p your_password
 
@@ -52,6 +53,9 @@ create table acronyms (
 - get 
 ```
 curl http://localhost:5000/acronyms/PDF
+```
+- Then you will get something like this:
+```
 [
     [
         "PDF",
