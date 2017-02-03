@@ -1,5 +1,29 @@
 # Amy
 
+# Cassandra
+
+### Environment setup (on Ubuntu)
+- Download Cassandra from Apache [website](http://cassandra.apache.org)
+- tar -xvzf apache-cassandra-3.9-bin.tar.gz
+- Modify /etc/cassandra/cassandra.yaml, change rpc_address to 0.0.0.0 so that it can be accessed outside.
+- Start Cassabdra: {Cassandra Dir}/bin/cassandra -f
+- Connect Cassandra through cqlsh: cqlsh 127.0.0.1 -u your_username -p your_password
+
+### Create table
+```
+create table acronyms (
+	acronym text,
+	meaning text,
+	sentence text,
+	source text,
+	count bigint,
+    upvotes int,
+    downvotes int,
+	url text,
+	PRIMARY KEY (acronym, meaning)
+)
+```
+
 ## Web service
 
 ### Environment setup (on Ubuntu)
