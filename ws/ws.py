@@ -1,12 +1,14 @@
 '''
 ws.py
-webservice, use
+webservice
 '''
 import os
 from flask import Flask
+from flask import redirect
 from flask_restful import reqparse, abort, Api, Resource
 from cassandra.cluster import Cluster
 from cassandra.auth import PlainTextAuthProvider
+from cassandra.query import dict_factory
 
 app = Flask(__name__)
 api = Api(app)
@@ -23,16 +25,16 @@ cluster = Cluster(os.environ['CASSANDRA_CLUSTER'].split(','),\
         username=os.environ['CASSANDRA_USERNAME'], \
         password=os.environ['CASSANDRA_PASSWORD']))
 session = cluster.connect('mykeyspace')
+session.row_factory = dict_factory
 
-'''
-@app.teardown_appcontext
-def teardown_db(exception):
-    if session is not None:
-        session.shutdown()
-    if cluster is not None:
-        cluster.shutdown()
-    print 'cluster shutdown'
-'''
+@app.route('/')
+def index():
+    return redirect('/static/index.html')
+
+@app.after_request
+def after_request(response):
+    response.headers.add('Access-Control-Allow-Origin', '*')
+    return response
 
 def query_db(acronym):
     return list(session.execute(\
@@ -67,7 +69,11 @@ class Acronyms(Resource):
     def get(self, acronym):
         r = query_db(acronym)
         abort_if_empty(r)
-        return r
+        return r, 200
+
+    def options (self):
+        return {'Allow' : 'GET' }, 200, \
+            { 'Access-Control-Allow-Methods' : 'GET'}
 
 # UpVotes
 class UpVotes(Resource):

@@ -12,15 +12,19 @@ print "username=%s, password=%s" % (os.environ['CASSANDRA_USERNAME'], \
 cluster = Cluster(nodeips, auth_provider=PlainTextAuthProvider(\
         username=os.environ['CASSANDRA_USERNAME'], \
         password=os.environ['CASSANDRA_PASSWORD']))
-cluster2 = Cluster('127.0.0.1', auth_provider=PlainTextAuthProvider(\
+cluster2 = Cluster(['127.0.0.1'], auth_provider=PlainTextAuthProvider(\
         username=os.environ['CASSANDRA_USERNAME'], \
         password=os.environ['CASSANDRA_PASSWORD']))
 session = cluster.connect('mykeyspace')
-session2 = cluster.connect('mykeyspace')
-update = session2.prepare("update acronyms set upvotes=0, downvotes=0 where acronym = ? and meaning = ?")
-for r in session.execute("select acronym, meaning from acronyms"):
-    print r.acronym, r.meaning
-    session2.execute(update, (r.acronym, r.meaning))
+session2 = cluster2.connect('mykeyspace')
+insert = session2.prepare("Insert into acronyms (acronym, meaning, count, \
+	upvotes, downvotes, sentence, source, url) \
+	values(?, ?, 0, 0, 0, ?, ?, ?)")
+i = 0
+for r in session.execute("select *  from acronyms"):
+    print i, r.acronym, r.meaning
+    i = i+1
+    session2.execute(insert, (r.acronym, r.meaning, r.sentence, r.source, r.url))
 cluster.shutdown()
 cluster2.shutdown()
 
