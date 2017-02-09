@@ -34,6 +34,24 @@ create table acronyms (
 )
 ```
 
+## KAFKA/Spark
+
+### Environment setup (on Ubuntu)
+- curl -O http://www.scala-lang.org/files/archive/scala-2.11.8.deb
+- sudo dpkg -i scala-2.11.8.deb
+- wget http://apache.claz.org/kafka/0.10.1.1/kafka_2.11-0.10.1.1.tgz
+- tar -xvzf kafka_2.11-0.10.1.1.tgz
+- wget http://d3kbcqa49mib13.cloudfront.net/spark-2.1.0-bin-hadoop2.7.tgz
+- tar -xvzf spark-2.1.0-bin-hadoop2.7.tgz
+- pip install kafka-python
+- cd {kafka dir}
+- bin/kafka-topics.sh --create --zookeeper localhost:2181 --replication-factor 1 --partitions 1 --topic acronym
+- bin/kafka-topics.sh --list --zookeeper localhost:2181
+
+### Start Kafka
+- bin/zookeeper-server-start.sh config/zookeeper.properties
+- bin/kafka-server-start.sh config/server.properties
+
 ## Web service
 
 ### Environment setup (on Ubuntu)
