@@ -6,9 +6,13 @@ import os
 from flask import Flask
 from flask import redirect
 from flask_restful import reqparse, abort, Api, Resource
+
 from cassandra.cluster import Cluster
 from cassandra.auth import PlainTextAuthProvider
 from cassandra.query import dict_factory
+
+from kafka import KafkaProducer
+
 
 app = Flask(__name__)
 api = Api(app)
@@ -26,6 +30,8 @@ cluster = Cluster(os.environ['CASSANDRA_CLUSTER'].split(','),\
         password=os.environ['CASSANDRA_PASSWORD']))
 session = cluster.connect('mykeyspace')
 session.row_factory = dict_factory
+
+producer = KafkaProducer(bootstrap_servers=os.environ['KAFKA_BOOTSTRAP_SERVERS'].split(','))
 
 @app.route('/')
 def index():
@@ -69,6 +75,11 @@ class Acronyms(Resource):
     def get(self, acronym):
         r = query_db(acronym)
         abort_if_empty(r)
+        try:
+            producer.send('acronyms', acronym.encode('utf-8'))
+        except Exception as e:
+            print "send %s to Kafka failed" % acronym
+            print e.message
         return r, 200
 
     def options (self):

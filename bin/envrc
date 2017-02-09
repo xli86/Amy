@@ -1,4 +1,4 @@
-# cassandra info
-export CASSANDRA_CLUSTER=<node_add1>,<node_add2>,<node_add3>
-export CASSANDRA_USERNAME=<user_name>
-export CASSANDRA_PASSWORD=<password>
+export CASSANDRA_CLUSTER=127.0.0.1
+export CASSANDRA_USERNAME=sys
+export CASSANDRA_PASSWORD=123
+export KAFKA_BOOTSTRAP_SERVERS=localhost:9092
