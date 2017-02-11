@@ -52,6 +52,18 @@ create table acronyms (
 - bin/zookeeper-server-start.sh config/zookeeper.properties
 - bin/kafka-server-start.sh config/server.properties
 
+## Redis
+
+### Environment setup (on Ubuntu)
+- wget http://download.redis.io/redis-stable.tar.gz
+- tar xvzf redis-stable.tar.gz
+- cd redis-stable
+- make
+- sudo pip install redis
+
+### Start Redis
+redis-stable/src/redis-server. Redis port - 6379
+
 ## Web service
 
 ### Environment setup (on Ubuntu)
@@ -97,3 +109,6 @@ curl http://localhost:5000/acronyms/PDF
 ]
 ```
 
+## Start Spark Streaming Jobs
+
+spark-2.1.0-bin-hadoop2.7/bin/spark-submit --packages org.apache.spark:spark-streaming-kafka-0-8_2.11:2.1.0 Amy/spark/stream.py
