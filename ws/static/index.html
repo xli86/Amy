@@ -35,11 +35,55 @@
         border-color: #FFA6A6;
         background-color: #F7CFCF;
       }
+
+      body {
+        margin: 0;
+      }
+
+      ul {
+        list-style-type: none;
+        margin: 0;
+        padding: 0;
+        width: 25%;
+        background-color: #f1f1f1;
+        position: fixed;
+        height: 100%;
+        overflow: auto;
+      }
+
+      li a {
+        display: block;
+        color: #000;
+        padding: 8px 16px;
+        text-decoration: none;
+      }
+
+      li a.active {
+        background-color: #4CAF50;
+        color: white;
+      }
+
+      li a:hover:not(.active) {
+        background-color: #555;
+        color: white;
+      }
     </style>
   </head>
 
-  <body>
-    <div ng-controller="gListCtrl">
+  <body ng-controller="gListCtrl">
+  <div>
+    <ul>
+      <li><a class="active" href="">Trending  searchs (1 minuate)</a></li>
+      <div ng-repeat="r in topMin">
+        <li><a href="" ng-click="getList(r[0])">{{r[0]}}[{{r[1]}}]</a></li>
+      </div>
+      <li><a class="active" href="">Trending  search (1 week)</a></li>
+      <div ng-repeat="r in topWeek">
+        <li><a href="" ng-click="getList(r[0])">{{r[0]}}[{{r[1]}}]</a></li>
+      </div>
+    </ul>
+  </div>
+    <div style="margin-left:25%;padding:1px 16px;">
       <p>
         <div align="center">
           <input type="text", ng-model="acronym", text="search...", style="height:30px;font-size:16pt;"></input>
@@ -55,17 +99,15 @@
         <tr>
           <th><h2>{{search}}<h2></th>
           <th></th>
-          <th></th>
         </tr>
       </thead>
       <tbody ng-repeat="r in rs">
         <tr>
           <td></td>
           <td>
-            <h3>{{r.meaning}} [upvote, downvote]</h3>
+            <h3>{{r.meaning}}</h3>
             <p>{{r.sentence}}<p>
           </td>
-          <td>(<a href={{r.url}} target="_blank">source</a>)</td>
         </tr>
       </tbody>
       </table>

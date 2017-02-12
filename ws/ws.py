@@ -3,6 +3,9 @@ ws.py
 webservice
 '''
 import os
+import json
+import redis
+
 from flask import Flask
 from flask import redirect
 from flask_restful import reqparse, abort, Api, Resource
@@ -33,6 +36,9 @@ session.row_factory = dict_factory
 
 producer = KafkaProducer(bootstrap_servers=os.environ['KAFKA_BOOTSTRAP_SERVERS'].split(','))
 
+cache = redis.StrictRedis(host=os.environ['REDIS_HOST'],\
+         port=os.environ['REDIS_PORT'], db=os.environ['REDIS_DB'])
+
 @app.route('/')
 def index():
     return redirect('/static/index.html')
@@ -51,25 +57,12 @@ def query(acronym, meaning):
         if r['meaning'] == meaning:
             return r
 
-def upvote(acronym, meaning):
-    r = query(acronym, meaning)
-    if r is not None:
-        r['count'] = r['count'] + 1
-    return r
-
-def downvote(acronym, meaning):
-    r = query(acronym, meaning)
-    if (r is not None) and (r['count'] > 0):
-        r['count'] = r['count'] - 1
-    return r
-
-
 def abort_if_empty(r):
     if r is None or len(r) == 0:
         abort(404, message="doesn't exist")
 
 # acronym
-# shows a single acronym item and lets you delete a acronym item
+# shows a single acronym item
 class Acronyms(Resource):
 
     def get(self, acronym):
@@ -86,43 +79,26 @@ class Acronyms(Resource):
         return {'Allow' : 'GET' }, 200, \
             { 'Access-Control-Allow-Methods' : 'GET'}
 
-# UpVotes
-class UpVotes(Resource):
+# stats
+# shows a single stat
+class Stats(Resource):
 
-    def get(self, acronym, meaning):
-        return query(acronym, meaning)
+    def get(self, key):
+        r = []
+        try:
+            r = json.loads(cache.get(key))
+        except Exception as e:
+            print "get %s from redis failed" % key
+            print e.message
+        return r, 200
 
-    def put(self, acronym, meaning):
-        abort_if_acronym_doesnt_exist(acronym, meaning)
-        upvote(acronym, meaning)
-        return query(acronym, meaning)
+    def options (self):
+        return {'Allow' : 'GET' }, 200, \
+            { 'Access-Control-Allow-Methods' : 'GET'}
 
-    def delete(self, acronym, meaning):
-        abort_if_acronym_doesnt_exist(acronym, meaning)
-        downvote(acronym, meaning)
-        return query(acronym, meaning)
-
-# UpVotes
-class DownVotes(Resource):
-
-    def get(self, acronym, meaning):
-        return query(acronym, meaning)
-
-    def put(self, acronym, meaning):
-        abort_if_acronym_doesnt_exist(acronym, meaning)
-        downvote(acronym, meaning)
-        return query(acronym, meaning), 201
-
-    def delete(self, acronym, meaning):
-        abort_if_acronym_doesnt_exist(acronym, meaning)
-        upvote(acronym, meaning)
-        return query(acronym, meaning), 204
-
-##
 ## Actually setup the Api resource routing here
-##
 api.add_resource(Acronyms, '/acronyms/<acronym>')
-api.add_resource(UpVotes, '/<acronym>/<meaning>/votes')
+api.add_resource(Stats, '/stats/<key>')
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', debug=True, threaded=True)

@@ -5,18 +5,23 @@ angularjs app
 // AngularJS Module
 var app = angular.module('app', ['ngRoute', 'ngResource']);
 
-// Acronyms service
+// register services
 app.factory("Acronyms", function($resource) {
   return $resource("/acronyms/:acronym");
 });
+app.factory("Stats", function($resource) {
+  return $resource("/stats/:key");
+});
 
 // Controller
-app.controller("gListCtrl", function($scope, Acronyms) {
+app.controller("gListCtrl", function($scope, Acronyms, Stats) {
   $scope.acronym = "";
   $scope.error = "";
   $scope.rs = [];
+  $scope.topMin = [];
+  $scope.topWeek = [];
   $scope.search = "";
-
+  
   // get list of acronyms match the input, then populate $scope.rs
   $scope.getList = function(acronym) {
     $scope.search = acronym;
@@ -40,5 +45,24 @@ app.controller("gListCtrl", function($scope, Acronyms) {
       }
     );
   };
+
+  // get stats info
+  $scope.getStatMin = function(key, r) {
+    Stats.query(
+      {key: key},
+      function(data) {
+        r.length = 0;
+        r.push.apply(r, data);
+      },
+      function(response) {
+        console.log("get " + key + " response " + response.status);
+        r.length = 0;
+      }
+    );
+  };
+  
+  $scope.getStatMin('topMin', $scope.topMin);
+  $scope.getStatMin('topWeek', $scope.topWeek);
+
 });
 
